@@ -29,6 +29,7 @@ The duplicate check is heuristic: it depends on the identifying fields available
 ## Files
 
 - `Sai's Reimbursements Filer.sanitized.json` — public-import workflow with private identifiers removed.
+- [`docs/sais-n8n-reimbursement-filer-pitch-deck.pptx`](docs/sais-n8n-reimbursement-filer-pitch-deck.pptx) — downloadable 10-slide product case study and pitch deck.
 - `README.md` — this setup and security guide.
 
 ## Setup
