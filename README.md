@@ -74,15 +74,6 @@ PDF, JPEG, and PNG attachments are accepted. Other attachment types receive an u
 - If a secret was ever pasted into the original workflow or shared elsewhere, rotate it before publishing.
 - Test with non-sensitive sample receipts first and inspect n8n execution logs for accidental data exposure.
 
-## Publishing checklist
-
-- [ ] Replace all placeholders with your own resources locally.
-- [ ] Assign and test your own n8n credentials.
-- [ ] Confirm the webhook uses the production URL after activation.
-- [ ] Test unsupported files, multiple files, successful filing, and duplicate detection.
-- [ ] Remove sample personal data and execution history before sharing.
-- [ ] Review the workflow JSON once more before pushing it to GitHub.
-
 ## License
 
-Add the license you want to use before publishing this repository.
+This project is licensed under the [MIT License](LICENSE).
