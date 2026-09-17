@@ -1,0 +1,1183 @@
+{
+  "name": "Sai's Reimbursements Filer",
+  "nodes": [
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"hostAppDataAction\": {\n    \"chatDataAction\": {\n      \"createMessageAction\": {\n        \"message\": {\n          \"text\": \"Got it! I'm processing your receipt now. I'll let you know once it's filed.\"\n        }\n      }\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -544,
+        -144
+      ],
+      "id": "0b3ff363-6f86-4c78-9724-d10542583b77",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const item = $input.item;\n\n// Get THIS receipt's attachment metadata from Split Receipts\nconst attachment =\n  $('Split Receipts').item.json['body.chat.messagePayload.message.attachment'];\n\n// Keep the downloaded bytes unchanged.\n// Correct n8n's file metadata for this specific receipt.\nitem.binary.data.fileName = attachment.contentName;\nitem.binary.data.mimeType = attachment.contentType;\n\n// Unique ID for matching this receipt later\nitem.json.receipt_id = attachment.name;\n\nreturn item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        48
+      ],
+      "id": "036c7860-056a-4e5a-a2dd-ecb765ba2571",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "238c1c4f-4c0d-420e-8c93-9ab5f78702cb",
+              "name": "output[0].content[0].text.merchant_name",
+              "value": "={{ $json.output[0].content[0].text.merchant_name }}",
+              "type": "string"
+            },
+            {
+              "id": "df68f321-da8a-4a48-b4f9-91bff52b23bd",
+              "name": "output[0].content[0].text.expense_date",
+              "value": "={{ $json.output[0].content[0].text.expense_date }}",
+              "type": "string"
+            },
+            {
+              "id": "f167e171-a10f-4ef3-b0c7-3097ffd5eff2",
+              "name": "output[0].content[0].text.amount",
+              "value": "={{ $json.output[0].content[0].text.amount }}",
+              "type": "number"
+            },
+            {
+              "id": "cee28b9b-d538-4d62-a8d6-4f63c4e27edb",
+              "name": "output[0].content[0].text.currency",
+              "value": "={{ $json.output[0].content[0].text.currency }}",
+              "type": "string"
+            },
+            {
+              "id": "826b1a6d-6d4f-4180-b084-b97994551bcf",
+              "name": "output[0].content[0].text.tax_amount",
+              "value": "={{ $json.output[0].content[0].text.tax_amount }}",
+              "type": "string"
+            },
+            {
+              "id": "5d0545d2-e9b4-4e81-9656-b2d537bcebec",
+              "name": "output[0].content[0].text.invoice_number",
+              "value": "={{ $json.output[0].content[0].text.invoice_number }}",
+              "type": "string"
+            },
+            {
+              "id": "206dd334-b16c-4e3c-aea6-878041f76b3f",
+              "name": "output[0].content[0].text.expense_category",
+              "value": "={{ $json.output[0].content[0].text.expense_category }}",
+              "type": "string"
+            },
+            {
+              "id": "267e2bb7-5fff-4515-8cf6-f436b67d4e68",
+              "name": "output[0].content[0].text.description",
+              "value": "={{ $json.output[0].content[0].text.description }}",
+              "type": "string"
+            },
+            {
+              "id": "660f4a6d-483a-42a2-91ad-4c310d5b90e9",
+              "name": "output[0].content[0].text.payment_method",
+              "value": "={{ $json.output[0].content[0].text.payment_method }}",
+              "type": "string"
+            },
+            {
+              "id": "d3bdfedb-3b6e-4ac6-a865-6ffc6938546c",
+              "name": "output[0].content[0].text.confidence",
+              "value": "={{ $json.output[0].content[0].text.confidence }}",
+              "type": "number"
+            },
+            {
+              "id": "0eabfbf3-8903-4808-9203-0d56031aa28f",
+              "name": "employee_Name",
+              "value": "={{ $('Google Chat incoming message Webhook').item.json.body.chat.user.displayName }}",
+              "type": "string"
+            },
+            {
+              "id": "00ddb503-bb98-43da-818f-6dff50886144",
+              "name": "employee_email",
+              "value": "={{ $('Google Chat incoming message Webhook').item.json.body.chat.user.email }}",
+              "type": "string"
+            },
+            {
+              "id": "6b05ddaf-5d6b-42ec-919a-8dbb5ffe9ace",
+              "name": "submitted_at",
+              "value": "={{ $('Google Chat incoming message Webhook').item.json.body.chat.eventTime }}",
+              "type": "string"
+            },
+            {
+              "id": "6749b625-0ede-478a-b026-fb4330ac13f8",
+              "name": "message_id",
+              "value": "={{ $('Google Chat incoming message Webhook').item.json.body.chat.messagePayload.message.name }}",
+              "type": "string"
+            },
+            {
+              "id": "3271db90-c083-4061-8679-875b58a8608d",
+              "name": "original_filename",
+              "value": "={{ $('Split Receipts').item.json['body.chat.messagePayload.message.attachment'].contentName }}",
+              "type": "string"
+            },
+            {
+              "id": "701b6199-6cf3-47b2-879b-bff89e636b46",
+              "name": "receipt_id",
+              "value": "={{ $('Code in JavaScript').item.json.receipt_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1456,
+        -80
+      ],
+      "id": "cde2288c-1b5d-4161-b920-9b81c762b73f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "receipt_id",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2416,
+        32
+      ],
+      "id": "0761b0e2-5b00-457e-be38-0804f14ec5e7",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_YOUR_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "YOUR_REIMBURSEMENT_TRACKER",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REPLACE_WITH_YOUR_SHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Reimbursements Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REPLACE_WITH_YOUR_SHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "submitted_at": "={{ $('Edit Fields').item.json.submitted_at }}",
+            "expense_date": "={{ $('Edit Fields').item.json.output[0].content[0].text.expense_date }}",
+            "merchant_name": "={{ $('Edit Fields').item.json.output[0].content[0].text.merchant_name }}",
+            "amount": "={{ $('Edit Fields').item.json.output[0].content[0].text.amount }}",
+            "expense_category": "={{ $('Edit Fields').item.json.output[0].content[0].text.expense_category }}",
+            "description": "={{ $('Edit Fields').item.json.output[0].content[0].text.description }}",
+            "currency": "={{ $('Edit Fields').item.json.output[0].content[0].text.currency }}",
+            "tax_amount": "={{ $('Edit Fields').item.json.output[0].content[0].text.tax_amount }}",
+            "invoice_number": "={{ $('Edit Fields').item.json.output[0].content[0].text.invoice_number }}",
+            "payment_method": "={{ $('Edit Fields').item.json.output[0].content[0].text.payment_method }}",
+            "confidence": "={{ $('Edit Fields').item.json.output[0].content[0].text.confidence }}",
+            "original_filename": "={{ $('Edit Fields').item.json.original_filename }}",
+            "message_id": "={{ $('Edit Fields').item.json.message_id }}",
+            "employee_name": "={{ $('Edit Fields').item.json.employee_Name }}",
+            "employee_email": "={{ $('Edit Fields').item.json.employee_email }}",
+            "receipt_drive_id": "={{ $json.id }}",
+            "receipt_drive_url": "={{ $json.webViewLink }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "submitted_at",
+              "displayName": "submitted_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "expense_date",
+              "displayName": "expense_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "merchant_name",
+              "displayName": "merchant_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "amount",
+              "displayName": "amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "expense_category",
+              "displayName": "expense_category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "currency",
+              "displayName": "currency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tax_amount",
+              "displayName": "tax_amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "invoice_number",
+              "displayName": "invoice_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "payment_method",
+              "displayName": "payment_method",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "receipt_drive_id",
+              "displayName": "receipt_drive_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "receipt_drive_url",
+              "displayName": "receipt_drive_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "confidence",
+              "displayName": "confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "original_filename",
+              "displayName": "original_filename",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "employee_name",
+              "displayName": "employee_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "employee_email",
+              "displayName": "employee_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2768,
+        32
+      ],
+      "id": "a24c62b1-99ab-4a07-a74a-18a1f13c044d",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "iGVjD2F0Cer9OcX8",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.googleapis.com/v1/{{ $('Google Chat incoming message Webhook').item.json.body.chat.messagePayload.space.name }}/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ `✓ Reimbursement filed successfully!\n\nMerchant: ${$json.merchant_name}\nAmount: ${$json.currency} ${$json.amount}\nDate: ${$json.expense_date}\nCategory: ${$json.expense_category}\n\nYour receipt has been saved to Drive and added to the reimbursement tracker.` }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2960,
+        32
+      ],
+      "id": "2ff6f541-5fe6-477f-bfa0-75dea3096699",
+      "name": "Send Success Message",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "uwFYZt0rcqa2O6sg",
+          "name": "Google account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.googleapis.com/v1/{{ $('Google Chat incoming message Webhook').item.json.body.chat.messagePayload.space.name }}/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "Duplicate receipt detected.  This reimbursement appears to have already been submitted, so I haven't filed it again. lol :D. Nice try!"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2416,
+        -240
+      ],
+      "id": "7d12bd22-5538-411a-9e6a-7a95a335b517",
+      "name": "Duplicate detected message",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "uwFYZt0rcqa2O6sg",
+          "name": "Google account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0cec7740-805b-4d1b-92c2-c5536dd0c9d8",
+              "leftValue": "={{ $json.body.chat.messagePayload.message.attachment?.length || 0 }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -528,
+        80
+      ],
+      "id": "26da8208-1316-40c3-90ef-158b28f0f4c5",
+      "name": "Receipt Attached?"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "YOUR_N8N_WEBHOOK_PATH",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -752,
+        -64
+      ],
+      "id": "adab3c0d-38a9-46f9-b435-3fba33db66d2",
+      "name": "Google Chat incoming message Webhook",
+      "webhookId": "a76e5acf-14c2-401b-84cc-54077562b588"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        784,
+        -240
+      ],
+      "id": "e1946653-7691-4548-8325-ff7c8a90ea4d",
+      "name": "Upload the Receipt",
+      "credentials": {
+        "openAiApi": {
+          "id": "v2FzMGSWvouKz6wV",
+          "name": "Open AI Sai Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "You are an expense receipt extraction system.\n\nAnalyze the attached receipt/invoice and extract the reimbursement information.\n\nReturn the following fields:\n- merchant_name\n- expense_date\n- amount\n- currency\n- tax_amount\n- invoice_number\n- expense_category\n- description\n- payment_method\n- confidence\n\nRules:\n- expense_date must use YYYY-MM-DD format.\n- amount and tax_amount must be numbers without currency symbols or commas.\n- Use ISO currency codes such as INR, USD, EUR.\n- expense_category must be one of:\n  Travel,\n  Food & Meals,\n  Accommodation,\n  Office Supplies,\n  Software & Subscriptions,\n  Client/Business Entertainment,\n  Communication,\n  Other.\n- Do not invent missing information. Use null when a field cannot be determined.\n- description should be concise.\n- confidence must be a number from 0 to 1 representing overall extraction confidence.\n- Extract information from the receipt itself, not from assumptions."
+            },
+            {
+              "type": "image",
+              "imageType": "base64"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "name": "sai_reimbursement_filer_schema",
+              "schema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"merchant_name\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"expense_date\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"amount\": {\n      \"type\": [\"number\", \"null\"]\n    },\n    \"currency\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"tax_amount\": {\n      \"type\": [\"number\", \"null\"]\n    },\n    \"invoice_number\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"expense_category\": {\n      \"type\": [\"string\", \"null\"],\n      \"enum\": [\n        \"Travel\",\n        \"Food & Meals\",\n        \"Accommodation\",\n        \"Office Supplies\",\n        \"Software & Subscriptions\",\n        \"Client/Business Entertainment\",\n        \"Communication\",\n        \"Other\",\n        null\n      ]\n    },\n    \"description\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"payment_method\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"confidence\": {\n      \"type\": \"number\",\n      \"minimum\": 0,\n      \"maximum\": 1\n    }\n  },\n  \"required\": [\n    \"merchant_name\",\n    \"expense_date\",\n    \"amount\",\n    \"currency\",\n    \"tax_amount\",\n    \"invoice_number\",\n    \"expense_category\",\n    \"description\",\n    \"payment_method\",\n    \"confidence\"\n  ],\n  \"additionalProperties\": false\n}",
+              "description": "Extract structured reimbursement details from an uploaded receipt or invoice, using null for information that cannot be reliably determined.",
+              "strict": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        960,
+        -80
+      ],
+      "id": "249ee362-cb33-4761-bdcc-7cfddb863cc2",
+      "name": "Data Extraction with Instructions to Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "v2FzMGSWvouKz6wV",
+          "name": "Open AI Sai Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_YOUR_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "YOUR_REIMBURSEMENT_TRACKER",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REPLACE_WITH_YOUR_SHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Reimbursements Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REPLACE_WITH_YOUR_SHEET_ID/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "employee_email",
+              "lookupValue": "={{ $json.employee_email }}"
+            },
+            {
+              "lookupColumn": "merchant_name",
+              "lookupValue": "={{ $json.output[0].content[0].text.merchant_name }}"
+            },
+            {
+              "lookupColumn": "expense_date",
+              "lookupValue": "={{ $json.output[0].content[0].text.expense_date }}"
+            },
+            {
+              "lookupColumn": "amount",
+              "lookupValue": "={{ $json.output[0].content[0].text.amount }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1760,
+        -240
+      ],
+      "id": "6a7e5f9a-a64b-4c18-9a19-7572b80fbb0b",
+      "name": "Fetch existing rows",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "iGVjD2F0Cer9OcX8",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d0feeb18-b31e-437f-b949-b130dadd4075",
+              "leftValue": "={{ $json.row_number ?? 0 }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2176,
+        -96
+      ],
+      "id": "3b60ddb9-17ac-4709-879e-2970c6d510a8",
+      "name": "Check duplicate detection",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Edit Fields').item.json.original_filename }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_YOUR_DRIVE_FOLDER_ID",
+          "mode": "list",
+          "cachedResultName": "YOUR_RECEIPTS_FOLDER",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/REPLACE_WITH_YOUR_DRIVE_FOLDER_ID"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2592,
+        32
+      ],
+      "id": "0be85a34-13f2-4beb-a806-ee921fb73099",
+      "name": "Store the receipt in the drive folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C8MYy6uBF9QOLr4n",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bdd41ee9-779a-4b75-be57-27a943c7ec4e",
+              "leftValue": "={{ $json['body.chat.messagePayload.message.attachment'].contentType }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "b6db6b7a-8260-4143-a0e9-919cfcff8090",
+              "leftValue": "={{ $json['body.chat.messagePayload.message.attachment'].contentType }}",
+              "rightValue": "image/png",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "9d773d78-3c31-4bb5-872d-92efe3027a3d",
+              "leftValue": "={{ $json['body.chat.messagePayload.message.attachment'].contentType }}",
+              "rightValue": "image/jpeg",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -96,
+        64
+      ],
+      "id": "e521d362-0f38-4ac5-b30a-cdbf253c47d7",
+      "name": "Supported file type check"
+    },
+    {
+      "parameters": {
+        "method": "=POST",
+        "url": "=https://chat.googleapis.com/v1/{{ $('Google Chat incoming message Webhook').item.json.body.chat.messagePayload.space.name }}/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "Hi! I can help you file a reimbursement.  Please attach your receipt as a PDF or image, and I'll extract the details, check for duplicates, save the receipt, and add it to the reimbursement tracker."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -304,
+        272
+      ],
+      "id": "8cd7b7a6-aa1c-4b0d-94a2-0bfc6ee46820",
+      "name": "Standard Message",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "uwFYZt0rcqa2O6sg",
+          "name": "Google account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.googleapis.com/v1/{{ $('Google Chat incoming message Webhook').item.json.body.chat.messagePayload.space.name }}/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "Attached type unsupported. PDFs, JPEGs, or PNGs only are allowed as attachments."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        128,
+        256
+      ],
+      "id": "2e0d883f-0635-4328-89f1-d876b50fbd98",
+      "name": "File type unsupported message",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "uwFYZt0rcqa2O6sg",
+          "name": "Google account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=body.chat.messagePayload.message.attachment",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        64
+      ],
+      "id": "2d9f1d5b-6f52-4daf-a62d-5d5d2d9438bf",
+      "name": "Split Receipts"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2016,
+        -96
+      ],
+      "id": "6611bdcb-6703-4654-ae9b-d1c6272c86e4",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9464a204-88fc-454c-a790-64e737aeb540",
+              "leftValue": "={{ $json['body.chat.messagePayload.message.attachment'].contentType }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        560,
+        -96
+      ],
+      "id": "a7cf422c-d49a-4f18-8951-350606147723",
+      "name": "PDF or Image Checker"
+    },
+    {
+      "parameters": {
+        "url": "=https://chat.googleapis.com/v1/media/{{ $('Split Receipts').item.json['body.chat.messagePayload.message.attachment'].attachmentDataRef.resourceName }}?alt=media",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        128,
+        48
+      ],
+      "id": "ea1445c8-d330-41f1-91a2-b151ae70085b",
+      "name": "HTTP Request to fetch the receipt uploaded",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "mUY43EnF3z4Ufyv4",
+          "name": "Google account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "You are an expense receipt extraction system.\n\nAnalyze the attached receipt/invoice and extract the reimbursement information.\n\nReturn the following fields:\n- merchant_name\n- expense_date\n- amount\n- currency\n- tax_amount\n- invoice_number\n- expense_category\n- description\n- payment_method\n- confidence\n\nRules:\n- expense_date must use YYYY-MM-DD format.\n- amount and tax_amount must be numbers without currency symbols or commas.\n- Use ISO currency codes such as INR, USD, EUR.\n- expense_category must be one of:\n  Travel,\n  Food & Meals,\n  Accommodation,\n  Office Supplies,\n  Software & Subscriptions,\n  Client/Business Entertainment,\n  Communication,\n  Other.\n- Do not invent missing information. Use null when a field cannot be determined.\n- description should be concise.\n- confidence must be a number from 0 to 1 representing overall extraction confidence.\n- Extract information from the receipt itself, not from assumptions."
+            },
+            {
+              "type": "file",
+              "fileType": "fileId",
+              "fileId": "={{ $json.id }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "name": "sai_reimbursement_filer_schema",
+              "schema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"merchant_name\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"expense_date\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"amount\": {\n      \"type\": [\"number\", \"null\"]\n    },\n    \"currency\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"tax_amount\": {\n      \"type\": [\"number\", \"null\"]\n    },\n    \"invoice_number\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"expense_category\": {\n      \"type\": [\"string\", \"null\"],\n      \"enum\": [\n        \"Travel\",\n        \"Food & Meals\",\n        \"Accommodation\",\n        \"Office Supplies\",\n        \"Software & Subscriptions\",\n        \"Client/Business Entertainment\",\n        \"Communication\",\n        \"Other\",\n        null\n      ]\n    },\n    \"description\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"payment_method\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"confidence\": {\n      \"type\": \"number\",\n      \"minimum\": 0,\n      \"maximum\": 1\n    }\n  },\n  \"required\": [\n    \"merchant_name\",\n    \"expense_date\",\n    \"amount\",\n    \"currency\",\n    \"tax_amount\",\n    \"invoice_number\",\n    \"expense_category\",\n    \"description\",\n    \"payment_method\",\n    \"confidence\"\n  ],\n  \"additionalProperties\": false\n}",
+              "description": "Extract structured reimbursement details from an uploaded receipt or invoice, using null for information that cannot be reliably determined.",
+              "strict": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        960,
+        -240
+      ],
+      "id": "ead99dbd-987a-4be0-83d6-09ed1d7a82ae",
+      "name": "Data Extraction with Instructions to Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "v2FzMGSWvouKz6wV",
+          "name": "Open AI Sai Credentials"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "PDF or Image Checker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Fetch existing rows",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Store the receipt in the drive folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send Success Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receipt Attached?": {
+      "main": [
+        [
+          {
+            "node": "Split Receipts",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Standard Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Chat incoming message Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Receipt Attached?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload the Receipt": {
+      "main": [
+        [
+          {
+            "node": "Data Extraction with Instructions to Model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Extraction with Instructions to Model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch existing rows": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check duplicate detection": {
+      "main": [
+        [
+          {
+            "node": "Duplicate detected message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store the receipt in the drive folder": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supported file type check": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to fetch the receipt uploaded",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "File type unsupported message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Receipts": {
+      "main": [
+        [
+          {
+            "node": "Supported file type check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Check duplicate detection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF or Image Checker": {
+      "main": [
+        [
+          {
+            "node": "Upload the Receipt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Data Extraction with Instructions to Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to fetch the receipt uploaded": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Extraction with Instructions to Model1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "23608f0d-4f73-4031-87c6-ed3f99f93abd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "189438f82ec94dca17e49bef83816f14584f661459668abdb938dd6085789f14"
+  },
+  "nodeGroups": [],
+  "id": "0EdtT1hPAvYbmbdC",
+  "tags": []
+}
