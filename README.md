@@ -2,6 +2,10 @@
 
 An n8n workflow that lets a user submit a receipt in Google Chat. It validates the attachment, extracts reimbursement fields with OpenAI, checks for a likely duplicate in Google Sheets, stores the original receipt in Google Drive, and records the result in a reimbursement tracker.
 
+## Workflow overview
+
+![End-to-end n8n reimbursement filer workflow](assets/workflow-overview.png)
+
 ## What it does
 
 1. Receives Google Chat events through an n8n webhook.
